@@ -1,40 +1,46 @@
 <template>
   <div>
     <h1>Todo List</h1>
-     <input v-model="user" type="text">
-  <button @click="agregar">Agregar</button>
-  <ul>
-    <li v-for="item in listaElemento" :key="item.id">
-    {{ item.contenido }}
-    <button @click="eliminar(item.id)">Eliminar</button>
-  </li>
-  </ul>
+    <input v-model="user" type="text">
+    <button @click="agregar">Agregar</button>
+    <ul>
+      <li v-for="item in listaElemento" :key="item.id" :class="{ completado: item.completado }">
+        <span>{{ item.contenido }}</span>
+        <div class="botones">
+          <button @click="completado(item.id)" class="btn-completar">{{ item.completado ? 'Desmarcar' : 'Completar' }}</button>
+          <button @click="eliminar(item.id)" class="btn-eliminar">Eliminar</button>
+        </div>
+      </li>
+    </ul>
   </div>
- 
-  
 </template>
 
 <script setup>
 import { ref } from 'vue';
-const user = ref('')
-const listaElemento = ref([])
-
-
+const user = ref('');
+const listaElemento = ref([]);
 
 const agregar = () => {
-  if(user.value.trim() === '') return
+  if (user.value.trim() === '') return;
   const nuevoElemento = {
     id: Date.now(),
-    contenido: user.value}
-
- listaElemento.value.push(nuevoElemento)
- user.value =''
-
-}
+    contenido: user.value,
+    completado: false 
+  };
+  listaElemento.value.push(nuevoElemento);
+  user.value = '';
+};
 
 const eliminar = (id) => {
- listaElemento.value = listaElemento.value.filter(item => item.id !== id)
-}
+  listaElemento.value = listaElemento.value.filter(item => item.id !== id);
+};
+
+const completado = (id) => {
+  const item = listaElemento.value.find(item => item.id === id);
+  if (item) {
+    item.completado = !item.completado;
+  }
+};
 </script>
 
 <style lang="scss">
@@ -87,21 +93,33 @@ input {
 }
 
 button {
-  background: $color-primario;
-  color: $color-texto;
   border: none;
-  padding: 14px 20px;
+  padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
   font-size: 1rem;
-  margin-left: 10px;
   text-transform: uppercase;
   margin-top: 10px;
 
   &:hover {
-    background: $color-boton-hover;
     transform: scale(1.05);
+  }
+}
+
+.btn-completar {
+  background: #2ecc71;
+  color: white;
+  &:hover {
+    background: lighten(#2ecc71, 10%);
+  }
+}
+
+.btn-eliminar {
+  background: $color-boton-eliminar;
+  color: white;
+  &:hover {
+    background: $color-boton-eliminar-hover;
   }
 }
 
@@ -122,19 +140,17 @@ ul {
     font-weight: 600;
     box-shadow: 0 4px 10px rgba(31, 111, 235, 0.3);
 
-    button {
-      background: $color-boton-eliminar;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      transition: background 0.3s, transform 0.2s;
-
-      &:hover {
-        background: $color-boton-eliminar-hover;
-        transform: scale(1.1);
-      }
+    .botones {
+      display: flex;
+      gap: 10px;
     }
   }
 }
 
+.completado {
+  text-decoration: line-through;
+  color: gray;
+  background-color: rgba(46, 204, 113, 0.2);
+  transition: all 300ms;
+}
 </style>
